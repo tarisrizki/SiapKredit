@@ -36,14 +36,24 @@ export function Navbar() {
             
             {/* Desktop Menu */}
         <div className="hidden md:flex md:items-center md:space-x-4">
-          <button 
-            onClick={toggleMode}
-            className="flex items-center gap-2 px-3 py-1.5 text-sm font-bold rounded-full bg-brand-100 text-brand-700 hover:bg-brand-200 transition-colors mr-2 border border-brand-200"
-            title="Ganti Tampilan"
-          >
-            {state.uiMode === 'simple' ? <Zap size={14} /> : <Settings size={14} />}
-            Mode {state.uiMode === 'simple' ? 'Simple' : 'Pro'}
-          </button>
+          <div className="flex bg-muted/50 p-1 rounded-full items-center mr-2 border border-border">
+            <button 
+              onClick={() => state.uiMode !== 'simple' && toggleMode()}
+              className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${state.uiMode === 'simple' ? 'bg-background shadow-sm text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+              title="Mode Awam"
+            >
+              <Zap size={14} />
+              Simple
+            </button>
+            <button 
+              onClick={() => state.uiMode !== 'pro' && toggleMode()}
+              className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${state.uiMode === 'pro' ? 'bg-background shadow-sm text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+              title="Mode Lengkap"
+            >
+              <Settings size={14} />
+              Pro
+            </button>
+          </div>
           
           {navLinks.map((link) => (
             <Link
@@ -109,13 +119,20 @@ export function Navbar() {
                   {link.name}
                 </Link>
               ))}
-              <button 
-                onClick={() => { toggleMode(); setIsOpen(false); }}
-                className="flex w-[calc(100%-32px)] mx-4 items-center justify-center gap-2 mt-4 px-3 py-3 text-sm font-bold rounded-xl bg-brand-100 text-brand-700 hover:bg-brand-200"
-              >
-                {state.uiMode === 'simple' ? <Zap size={16} /> : <Settings size={16} />}
-                Ganti ke Mode {state.uiMode === 'simple' ? 'Pro' : 'Simple'}
-              </button>
+              <div className="flex bg-muted/50 p-1 rounded-full items-center mx-4 mt-4 border border-border">
+                <button 
+                  onClick={() => { if(state.uiMode !== 'simple') toggleMode(); setIsOpen(false); }}
+                  className={`flex-1 py-2.5 rounded-full text-sm font-bold transition-all flex justify-center items-center gap-1.5 ${state.uiMode === 'simple' ? 'bg-background shadow-sm text-primary' : 'text-muted-foreground'}`}
+                >
+                  <Zap size={16} /> Simple
+                </button>
+                <button 
+                  onClick={() => { if(state.uiMode !== 'pro') toggleMode(); setIsOpen(false); }}
+                  className={`flex-1 py-2.5 rounded-full text-sm font-bold transition-all flex justify-center items-center gap-1.5 ${state.uiMode === 'pro' ? 'bg-background shadow-sm text-primary' : 'text-muted-foreground'}`}
+                >
+                  <Settings size={16} /> Pro
+                </button>
+              </div>
               <div className="mt-8 px-4">
                  <Link
                   to="/profil"
