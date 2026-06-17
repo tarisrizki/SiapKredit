@@ -5,6 +5,16 @@ const AppContext = createContext();
 
 const initialState = {
   transaksi: [],
+  dokumen: {
+    ktp: false,
+    kk: false,
+    nib: false,
+    npwp: false,
+    sku: false,
+    laporanKeuangan: false,
+    nota: false,
+    fotoUsaha: false,
+  },
   profil: {
     namaUsaha: '',
     jenisUsaha: 'Lainnya',
@@ -12,28 +22,21 @@ const initialState = {
     kota: '',
     omsetPerBulan: '<1 juta',
     keuanganTerpisah: false,
-    setupDone: false,
-  },
-  dokumen: {
-    ktp: false,
-    kk: false,
-    nib: false,
-    npwp: false,
-    fotoUsaha: false,
-    rekeningBank: false,
-    bpjsTK: false,
+    setupDone: false
   },
   chatHistory: [
-    { sender: 'sistem', text: 'Halo! Saya asisten SiapKredit. Anda bisa mencatat transaksi dengan bahasa sehari-hari. Contoh: "Jual 5 kaos @80rb" atau "Bayar listrik 150 ribu".' }
+    { sender: 'sistem', text: 'Halo! Saya asisten SiapKredit. Catat pengeluaran dan pemasukan harian Anda di sini ya. Contoh: "Jual 5 porsi soto @15rb" atau "Beli token listrik 50.000".' }
   ],
+  uiMode: 'simple', // 'simple' or 'pro'
   ui: {
-    period: '30H', // 7H, 30H, 3B, 6B, Semua
     isOnboarded: false,
   }
 };
 
 function appReducer(state, action) {
   switch (action.type) {
+    case 'TOGGLE_UI_MODE':
+      return { ...state, uiMode: state.uiMode === 'simple' ? 'pro' : 'simple' };
     case 'ADD_TRANSAKSI':
       return { ...state, transaksi: [action.payload, ...state.transaksi] };
     case 'DELETE_TRANSAKSI':

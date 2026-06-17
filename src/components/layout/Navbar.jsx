@@ -1,10 +1,16 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { TrendingUp, Menu, X, MessageSquare, LayoutDashboard, Award, FileCheck, BookOpen } from 'lucide-react';
+import { TrendingUp, Menu, X, MessageSquare, LayoutDashboard, Award, FileCheck, BookOpen, Settings, Zap } from 'lucide-react';
+import { useAppContext } from '../../context/AppContext';
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const { state, dispatch } = useAppContext();
+
+  const toggleMode = () => {
+    dispatch({ type: 'TOGGLE_UI_MODE' });
+  };
 
   const navLinks = [
     { name: 'Input Transaksi', path: '/input', icon: <MessageSquare size={18} /> },
@@ -29,21 +35,31 @@ export function Navbar() {
             </div>
             
             {/* Desktop Menu */}
-            <div className="hidden md:flex md:items-center md:space-x-8">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.path}
-                  to={link.path}
-                  className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium h-16 ${
-                    location.pathname === link.path
-                      ? 'border-brand-500 text-brand-500'
-                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                  }`}
-                >
-                  {link.name}
-                </Link>
-              ))}
-            </div>
+        <div className="hidden md:flex md:items-center md:space-x-4">
+          <button 
+            onClick={toggleMode}
+            className="flex items-center gap-2 px-3 py-1.5 text-sm font-bold rounded-full bg-brand-100 text-brand-700 hover:bg-brand-200 transition-colors mr-2 border border-brand-200"
+            title="Ganti Tampilan"
+          >
+            {state.uiMode === 'simple' ? <Zap size={14} /> : <Settings size={14} />}
+            Mode {state.uiMode === 'simple' ? 'Simple' : 'Pro'}
+          </button>
+          
+          {navLinks.map((link) => (
+            <Link
+              key={link.path}
+              to={link.path}
+              className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                location.pathname === link.path
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+              }`}
+            >
+              <span className="mr-2">{link.icon}</span>
+              {link.name}
+            </Link>
+          ))}
+        </div>
 
             {/* Mobile menu button */}
             <div className="flex items-center md:hidden">
@@ -83,16 +99,23 @@ export function Navbar() {
                   key={link.path}
                   to={link.path}
                   onClick={() => setIsOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-3 text-base font-medium ${
+                  className={`flex items-center px-3 py-2 rounded-md text-base font-medium mx-4 ${
                     location.pathname === link.path
-                      ? 'text-brand-600 bg-brand-50 border-l-4 border-brand-500'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 border-l-4 border-transparent'
+                      ? 'bg-primary/10 text-primary'
+                      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                   }`}
                 >
-                  {link.icon}
+                  <span className="mr-3">{link.icon}</span>
                   {link.name}
                 </Link>
               ))}
+              <button 
+                onClick={() => { toggleMode(); setIsOpen(false); }}
+                className="flex w-[calc(100%-32px)] mx-4 items-center justify-center gap-2 mt-4 px-3 py-3 text-sm font-bold rounded-xl bg-brand-100 text-brand-700 hover:bg-brand-200"
+              >
+                {state.uiMode === 'simple' ? <Zap size={16} /> : <Settings size={16} />}
+                Ganti ke Mode {state.uiMode === 'simple' ? 'Pro' : 'Simple'}
+              </button>
               <div className="mt-8 px-4">
                  <Link
                   to="/profil"
