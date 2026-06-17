@@ -1,10 +1,11 @@
 import React from 'react';
-import { Routes, Route, Navigate, HashRouter } from 'react-router-dom';
+import { Routes, Route, Navigate, HashRouter, useLocation } from 'react-router-dom';
 import { useAppContext } from './context/AppContext';
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
 import { OnboardingWizard } from './components/onboarding/OnboardingWizard';
 import { Toaster } from 'react-hot-toast';
+import { AnimatePresence, motion } from 'framer-motion';
 
 // Pages
 import { Landing } from './pages/Landing';
@@ -26,23 +27,47 @@ function OnboardingGate({ children }) {
   );
 }
 
+const PageWrapper = ({ children }) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      transition={{ duration: 0.3 }}
+      className="h-full"
+    >
+      {children}
+    </motion.div>
+  );
+};
+
+function AnimatedRoutes() {
+  const location = useLocation();
+  
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<PageWrapper><Landing /></PageWrapper>} />
+        <Route path="/input" element={<PageWrapper><InputTransaksi /></PageWrapper>} />
+        <Route path="/dashboard" element={<PageWrapper><Dashboard /></PageWrapper>} />
+        <Route path="/skor" element={<PageWrapper><SkorKredit /></PageWrapper>} />
+        <Route path="/dokumen" element={<PageWrapper><Dokumen /></PageWrapper>} />
+        <Route path="/kur" element={<PageWrapper><PanduanKUR /></PageWrapper>} />
+        <Route path="/profil" element={<PageWrapper><ProfilUsaha /></PageWrapper>} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </AnimatePresence>
+  );
+}
+
 function App() {
   return (
     <HashRouter>
-      <div className="min-h-screen flex flex-col font-sans bg-[#F8F9FA] text-[#111827]">
+      <div className="min-h-screen flex flex-col font-sans bg-background text-foreground">
         <OnboardingGate>
           <Navbar />
           <main className="flex-1">
-            <Routes>
-              <Route path="/" element={<Landing />} />
-              <Route path="/input" element={<InputTransaksi />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/skor" element={<SkorKredit />} />
-              <Route path="/dokumen" element={<Dokumen />} />
-              <Route path="/kur" element={<PanduanKUR />} />
-              <Route path="/profil" element={<ProfilUsaha />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
+            <AnimatedRoutes />
           </main>
           <Footer />
           <Toaster 
@@ -55,9 +80,9 @@ function App() {
               },
               success: {
                 style: {
-                  background: '#F0FDF4',
-                  color: '#16A34A',
-                  border: '1px solid #BBF7D0',
+                  background: 'var(--success-50, #F0FDF4)',
+                  color: 'var(--success-600, #16A34A)',
+                  border: '1px solid var(--success-200, #BBF7D0)',
                 },
               },
             }}

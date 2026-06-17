@@ -1,22 +1,25 @@
-import React from 'react';
+import * as React from "react"
+import * as ProgressPrimitive from "@radix-ui/react-progress"
+import { cn } from "../../lib/utils"
 
-export function ProgressBar({ value, max = 100, colorClass = 'bg-brand-500', heightClass = 'h-2', showLabel = false, labelText = '' }) {
-  const percentage = Math.min(100, Math.max(0, (value / max) * 100));
-
+const ProgressBar = React.forwardRef(({ className, value, max = 100, colorClass, ...props }, ref) => {
+  const percentage = max > 0 ? (value / max) * 100 : 0;
   return (
-    <div className="w-full">
-      {showLabel && (
-        <div className="flex justify-between items-center mb-1 text-sm font-medium">
-          <span className="text-gray-700">{labelText}</span>
-          <span className="text-gray-500">{Math.round(percentage)}%</span>
-        </div>
+    <ProgressPrimitive.Root
+      ref={ref}
+      className={cn(
+        "relative h-4 w-full overflow-hidden rounded-full bg-secondary",
+        className
       )}
-      <div className={`w-full bg-gray-200 rounded-full overflow-hidden ${heightClass}`}>
-        <div
-          className={`${colorClass} ${heightClass} rounded-full transition-all duration-500 ease-out`}
-          style={{ width: `${percentage}%` }}
-        ></div>
-      </div>
-    </div>
-  );
-}
+      {...props}
+    >
+      <ProgressPrimitive.Indicator
+        className={cn("h-full w-full flex-1 transition-all duration-500 ease-in-out", colorClass || "bg-primary")}
+        style={{ transform: `translateX(-${100 - (percentage || 0)}%)` }}
+      />
+    </ProgressPrimitive.Root>
+  )
+})
+ProgressBar.displayName = ProgressPrimitive.Root.displayName
+
+export { ProgressBar }
