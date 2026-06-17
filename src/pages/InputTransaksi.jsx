@@ -1,203 +1,182 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
-import { ChatBubble } from '../components/transaction/ChatBubble';
-import { ParsedPreview } from '../components/transaction/ParsedPreview';
-import { parseTransaction } from '../utils/transactionParser';
 import { formatRupiah } from '../utils/formatters';
-import { Send, Loader2 } from 'lucide-react';
+import { Button } from '../components/ui/Button';
+import { Card } from '../components/ui/Card';
 import { motion, AnimatePresence } from 'framer-motion';
+import { CheckCircle2, ArrowDownCircle, ArrowUpCircle, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export function InputTransaksi() {
   const { state, dispatch } = useAppContext();
-  const [inputText, setInputText] = useState('');
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [parsedResult, setParsedResult] = useState(null);
+  const [activeTab, setActiveTab] = useState(null); // 'masuk' or 'keluar'
+  const [amount, setAmount] = useState('');
+  const [category, setCategory] = useState('');
   
-  const messagesEndRef = useRef(null);
-  
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  const handleTypeSelect = (type) => {
+    setActiveTab(type);
+    setAmount('');
+    setCategory(type === 'masuk' ? 'Penjualan' : 'Operasional');
   };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [state.chatHistory, parsedResult]);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!inputText.trim() || isProcessing || parsedResult) return;
-
-    const userText = inputText.trim();
-    setInputText('');
-    
-    dispatch({
-      type: 'ADD_CHAT_MESSAGE',
-      payload: { sender: 'user', text: userText }
-    });
-
-    setIsProcessing(true);
-    
-    setTimeout(() => {
-      const result = parseTransaction(userText);
-      setIsProcessing(false);
-
-      if (result) {
-        setParsedResult(result);
-      } else {
-        dispatch({
-          type: 'ADD_CHAT_MESSAGE',
-          payload: { 
-            sender: 'sistem', 
-            text: 'Hmm, saya kurang mengerti nominal atau transaksinya. Coba format seperti: "Jual baju 50rb" atau "Bayar listrik 150.000".' 
-          }
-        });
-      }
-    }, 600);
+  const handleNumClick = (num) => {
+    if (amount === '0') setAmount(num);
+    else setAmount(amount + num);
   };
 
-  const handleSave = (data) => {
+  const handleDelete = () => {
+    setAmount(amount.slice(0, -1));
+  };
+
+  const handleSave = () => {
+    if (!amount || parseInt(amount) === 0) {
+      toast.error('Masukkan jumlah uang terlebih dahulu!');
+      return;
+    }
+
+    const typeStr = activeTab === 'masuk' ? 'pemasukan' : 'pengeluaran';
+    
     const newTrx = {
-      ...data,
       id: `trx-${Date.now()}`,
       createdAt: Date.now(),
-      isManual: false
+      date: new Date().toISOString().split('T')[0],
+      type: typeStr,
+      amount: parseInt(amount),
+      category: category,
+      title: category, // Sederhana
+      isManual: true
     };
 
     dispatch({ type: 'ADD_TRANSAKSI', payload: newTrx });
-    setParsedResult(null);
     
-    dispatch({
-      type: 'ADD_CHAT_MESSAGE',
-      payload: { sender: 'sistem', text: `Sip! Transaksi ${data.type} sebesar ${formatRupiah(data.amount)} berhasil dicatat.` }
+    toast.success(`Berhasil mencatat uang ${activeTab}!`, {
+      icon: <CheckCircle2 className="text-success-600" size={30} />,
+      style: {
+        padding: '16px',
+        fontSize: '18px',
+        fontWeight: 'bold'
+      }
     });
 
-    toast.success('Transaksi disimpan! Skor kredit Anda diperbarui.');
+    // Reset
+    setActiveTab(null);
+    setAmount('');
   };
 
-  const handleEdit = () => {
-    setParsedResult(null);
-    dispatch({
-      type: 'ADD_CHAT_MESSAGE',
-      payload: { sender: 'sistem', text: 'Baik, silakan ketik ulang detail transaksinya.' }
-    });
-  };
-
-  const today = new Date().toISOString().split('T')[0];
-  const trxToday = state.transaksi.filter(t => t.date === today);
-  const inToday = trxToday.filter(t => t.type === 'pemasukan').reduce((a, b) => a + b.amount, 0);
-  const outToday = trxToday.filter(t => t.type === 'pengeluaran').reduce((a, b) => a + b.amount, 0);
-  const netToday = inToday - outToday;
+  // Kategori
+  const kategoriMasuk = ['Penjualan', 'Pinjaman', 'Lainnya'];
+  const kategoriKeluar = ['Operasional', 'Bahan Baku', 'Gaji', 'Listrik/Air', 'Lainnya'];
+  const categories = activeTab === 'masuk' ? kategoriMasuk : kategoriKeluar;
 
   return (
-    <div className="max-w-4xl mx-auto h-[calc(100vh-64px)] flex flex-col md:flex-row bg-background sm:border-x shadow-sm">
-      
-      {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col relative h-full">
-        <div className="p-4 border-b bg-background/80 backdrop-blur sticky top-0 z-10 flex justify-between items-center shadow-sm">
-           <div>
-             <h2 className="font-bold text-foreground">Catat Transaksi</h2>
-             <p className="text-xs text-muted-foreground">Ketik dengan bahasa sehari-hari</p>
-           </div>
-           <div className="md:hidden text-right">
-              <p className="text-xs font-medium text-success-600">In: {formatRupiah(inToday)}</p>
-              <p className="text-xs font-medium text-danger-600">Out: {formatRupiah(outToday)}</p>
-           </div>
-        </div>
+    <div className="max-w-xl mx-auto p-4 sm:p-6 pb-24">
+      <div className="text-center mb-8">
+        <h1 className="text-3xl font-extrabold text-foreground mb-2">Catat Uang</h1>
+        <p className="text-lg text-muted-foreground">Apa yang terjadi hari ini?</p>
+      </div>
 
-        <div className="flex-1 overflow-y-auto p-4 bg-muted/30">
-          <AnimatePresence>
-            {state.chatHistory.map((msg, idx) => (
-              <ChatBubble key={idx} message={msg} />
-            ))}
-            
-            {isProcessing && (
-              <motion.div 
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                className="flex w-full mb-4 justify-start"
-              >
-                <div className="bg-card px-4 py-3 rounded-2xl rounded-tl-sm border shadow-sm flex gap-2 items-center">
-                  <Loader2 size={16} className="animate-spin text-primary" />
-                  <span className="text-sm text-muted-foreground">Sedang memproses...</span>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {parsedResult && (
-            <ParsedPreview 
-              parsedData={parsedResult} 
-              onSave={handleSave} 
-              onEdit={handleEdit} 
-            />
-          )}
-          <div ref={messagesEndRef} />
-        </div>
-
-        {/* Input Area */}
-        <div className="p-3 bg-background border-t">
-           <div className="flex gap-2 mb-3 overflow-x-auto pb-1 hide-scrollbar">
-             <button onClick={() => setInputText('Jual ... Rp ...')} className="shrink-0 text-xs bg-muted hover:bg-muted/80 text-foreground py-1.5 px-3 rounded-full transition-colors">+ Penjualan</button>
-             <button onClick={() => setInputText('Bayar listrik ...')} className="shrink-0 text-xs bg-muted hover:bg-muted/80 text-foreground py-1.5 px-3 rounded-full transition-colors">+ Pengeluaran</button>
-             <button onClick={() => setInputText('Beli stok bahan ...')} className="shrink-0 text-xs bg-muted hover:bg-muted/80 text-foreground py-1.5 px-3 rounded-full transition-colors">+ HPP</button>
-           </div>
-
-          <form onSubmit={handleSubmit} className="flex gap-2 items-end">
-            <div className="flex-1 bg-muted/50 rounded-2xl border border-transparent focus-within:border-primary focus-within:bg-background transition-all overflow-hidden shadow-sm">
-              <textarea
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSubmit(e);
-                  }
-                }}
-                placeholder="Ketik transaksi di sini..."
-                className="w-full bg-transparent p-3 max-h-32 min-h-[48px] resize-none focus:outline-none text-sm"
-                rows={1}
-                disabled={parsedResult !== null}
-              />
-            </div>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              type="submit"
-              disabled={!inputText.trim() || parsedResult !== null}
-              className="bg-primary text-primary-foreground p-3.5 rounded-full hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shrink-0 shadow-md"
+      <AnimatePresence mode="wait">
+        {!activeTab ? (
+          <motion.div 
+            key="selection"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="flex flex-col gap-6 mt-8"
+          >
+            <button 
+              onClick={() => handleTypeSelect('masuk')}
+              className="bg-success-50 hover:bg-success-100 border-2 border-success-500 rounded-3xl p-8 flex flex-col items-center justify-center gap-4 transition-all shadow-lg active:scale-95"
             >
-              <Send size={18} className="translate-x-[-1px] translate-y-[1px]" />
-            </motion.button>
-          </form>
-        </div>
-      </div>
+              <div className="bg-success-500 text-white p-4 rounded-full">
+                <ArrowUpCircle size={64} />
+              </div>
+              <span className="text-3xl font-black text-success-700">Uang Masuk</span>
+              <span className="text-success-600 font-medium text-lg">Contoh: Jualan, Terima Uang</span>
+            </button>
 
-      {/* Sidebar Summary (Desktop) */}
-      <div className="hidden md:flex flex-col w-72 bg-card border-l p-5">
-        <h3 className="font-bold text-foreground mb-4">Ringkasan Hari Ini</h3>
-        
-        <div className="space-y-4">
-          <div className="bg-background p-4 rounded-xl border shadow-sm">
-            <p className="text-xs text-muted-foreground mb-1">Pemasukan</p>
-            <p className="text-lg font-bold text-success-600">{formatRupiah(inToday)}</p>
-          </div>
-          
-          <div className="bg-background p-4 rounded-xl border shadow-sm">
-            <p className="text-xs text-muted-foreground mb-1">Pengeluaran</p>
-            <p className="text-lg font-bold text-danger-600">{formatRupiah(outToday)}</p>
-          </div>
-          
-          <div className={`p-4 rounded-xl border ${netToday >= 0 ? 'bg-primary/5 border-primary/20' : 'bg-destructive/5 border-destructive/20'}`}>
-            <p className="text-xs font-medium text-muted-foreground mb-1">Saldo Bersih</p>
-            <p className={`text-2xl font-black tracking-tight ${netToday >= 0 ? 'text-primary' : 'text-destructive'}`}>
-              {formatRupiah(netToday)}
-            </p>
-          </div>
-        </div>
-      </div>
+            <button 
+              onClick={() => handleTypeSelect('keluar')}
+              className="bg-danger-50 hover:bg-danger-100 border-2 border-danger-500 rounded-3xl p-8 flex flex-col items-center justify-center gap-4 transition-all shadow-lg active:scale-95"
+            >
+              <div className="bg-danger-500 text-white p-4 rounded-full">
+                <ArrowDownCircle size={64} />
+              </div>
+              <span className="text-3xl font-black text-danger-700">Uang Keluar</span>
+              <span className="text-danger-600 font-medium text-lg">Contoh: Beli Barang, Bayar Gaji</span>
+            </button>
+          </motion.div>
+        ) : (
+          <motion.div 
+            key="input-form"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            className="flex flex-col gap-4"
+          >
+            <div className="flex justify-between items-center mb-2">
+              <button onClick={() => setActiveTab(null)} className="text-muted-foreground p-2 rounded-full hover:bg-muted text-lg font-bold">
+                ← Kembali
+              </button>
+              <span className={`text-xl font-black px-4 py-1.5 rounded-full ${activeTab === 'masuk' ? 'bg-success-100 text-success-700' : 'bg-danger-100 text-danger-700'}`}>
+                {activeTab === 'masuk' ? 'UANG MASUK' : 'UANG KELUAR'}
+              </span>
+            </div>
 
+            <Card className="p-6 border-2 shadow-md">
+              <p className="text-center text-muted-foreground font-bold mb-2">Jumlah (Rupiah)</p>
+              <div className="text-center text-4xl sm:text-5xl font-black text-foreground mb-6 overflow-x-auto whitespace-nowrap">
+                {amount ? formatRupiah(parseInt(amount)) : 'Rp 0'}
+              </div>
+
+              {/* Simple Numpad */}
+              <div className="grid grid-cols-3 gap-3 mb-6">
+                {['1','2','3','4','5','6','7','8','9','000','0'].map((num) => (
+                  <button 
+                    key={num} 
+                    onClick={() => handleNumClick(num)}
+                    className="bg-muted hover:bg-muted/80 active:bg-muted/50 rounded-2xl p-4 text-2xl font-bold text-foreground transition-colors"
+                  >
+                    {num}
+                  </button>
+                ))}
+                <button 
+                  onClick={handleDelete}
+                  className="bg-danger-50 hover:bg-danger-100 text-danger-600 rounded-2xl p-4 flex items-center justify-center transition-colors"
+                >
+                  <X size={32} />
+                </button>
+              </div>
+
+              <div className="mb-6">
+                <p className="font-bold text-lg mb-3">Pilih Kategori:</p>
+                <div className="flex flex-wrap gap-2">
+                  {categories.map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => setCategory(cat)}
+                      className={`px-4 py-3 rounded-xl text-lg font-bold transition-all border-2 ${
+                        category === cat 
+                          ? 'bg-primary text-primary-foreground border-primary' 
+                          : 'bg-background border-border text-muted-foreground'
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <Button 
+                onClick={handleSave} 
+                className={`w-full py-8 text-2xl font-black rounded-2xl shadow-xl ${activeTab === 'masuk' ? 'bg-success-500 hover:bg-success-600' : 'bg-danger-500 hover:bg-danger-600'}`}
+              >
+                SIMPAN CATATAN
+              </Button>
+            </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
