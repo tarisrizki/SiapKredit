@@ -61,7 +61,8 @@ export function hitungSkor(transaksi, profil, dokumen) {
 
     // Gap > 14 hari
     let maxGap = 0;
-    const sortedDates = [...dates].sort((a,b) => a-b);
+    const trxDates = transaksi.map(t => new Date(t.date).getTime());
+    const sortedDates = [...trxDates].sort((a,b) => a-b);
     for(let i=1; i<sortedDates.length; i++) {
         const gap = (sortedDates[i] - sortedDates[i-1]) / (1000 * 60 * 60 * 24);
         if(gap > maxGap) maxGap = gap;
