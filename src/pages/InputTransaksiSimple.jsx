@@ -4,19 +4,24 @@ import { formatRupiah } from '../utils/formatters';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle2, ArrowDownCircle, ArrowUpCircle, X } from 'lucide-react';
+import { CheckCircle2, ArrowDownCircle, ArrowUpCircle, X, Plus } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-export function InputTransaksi() {
+export function InputTransaksiSimple() {
   const { state, dispatch } = useAppContext();
   const [activeTab, setActiveTab] = useState(null); // 'masuk' or 'keluar'
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState('');
   
+  const [isAddingCustom, setIsAddingCustom] = useState(false);
+  const [customCatText, setCustomCatText] = useState('');
+  
   const handleTypeSelect = (type) => {
     setActiveTab(type);
     setAmount('');
     setCategory(type === 'masuk' ? 'Penjualan' : 'Operasional');
+    setIsAddingCustom(false);
+    setCustomCatText('');
   };
 
   const handleNumClick = (num) => {
@@ -26,6 +31,18 @@ export function InputTransaksi() {
 
   const handleDelete = () => {
     setAmount(amount.slice(0, -1));
+  };
+
+  const handleSaveCustomCat = () => {
+    if(customCatText.trim()) {
+      dispatch({ 
+        type: 'ADD_KATEGORI', 
+        payload: { type: activeTab, name: customCatText.trim() } 
+      });
+      setCategory(customCatText.trim());
+      setIsAddingCustom(false);
+      setCustomCatText('');
+    }
   };
 
   const handleSave = () => {
@@ -64,9 +81,15 @@ export function InputTransaksi() {
   };
 
   // Kategori
-  const kategoriMasuk = ['Penjualan', 'Pinjaman', 'Lainnya'];
-  const kategoriKeluar = ['Operasional', 'Bahan Baku', 'Gaji', 'Listrik/Air', 'Lainnya'];
-  const categories = activeTab === 'masuk' ? kategoriMasuk : kategoriKeluar;
+  const baseMasuk = ['Penjualan', 'Pinjaman'];
+  const baseKeluar = ['Operasional', 'Bahan Baku', 'Gaji', 'Listrik/Air'];
+  
+  const customMasuk = state.kategoriCustomMasuk || [];
+  const customKeluar = state.kategoriCustomKeluar || [];
+
+  const categories = activeTab === 'masuk' 
+    ? [...baseMasuk, ...customMasuk] 
+    : [...baseKeluar, ...customKeluar];
 
   return (
     <div className="max-w-xl mx-auto p-4 sm:p-6 pb-24">
@@ -154,7 +177,10 @@ export function InputTransaksi() {
                   {categories.map((cat) => (
                     <button
                       key={cat}
-                      onClick={() => setCategory(cat)}
+                      onClick={() => {
+                        setCategory(cat);
+                        setIsAddingCustom(false);
+                      }}
                       className={`px-4 py-3 rounded-xl text-lg font-bold transition-all border-2 ${
                         category === cat 
                           ? 'bg-primary text-primary-foreground border-primary' 
@@ -164,7 +190,35 @@ export function InputTransaksi() {
                       {cat}
                     </button>
                   ))}
+                  
+                  {!isAddingCustom && (
+                    <button
+                      onClick={() => setIsAddingCustom(true)}
+                      className="px-4 py-3 rounded-xl text-lg font-bold border-2 border-dashed border-border text-muted-foreground hover:bg-muted transition-all flex items-center gap-1"
+                    >
+                      <Plus size={20} /> Lainnya
+                    </button>
+                  )}
                 </div>
+
+                {isAddingCustom && (
+                  <div className="mt-4 flex gap-2">
+                    <input 
+                      type="text" 
+                      value={customCatText}
+                      onChange={(e) => setCustomCatText(e.target.value)}
+                      placeholder="Ketik kategori baru..."
+                      className="flex-1 px-4 py-3 text-lg font-bold border-2 border-border rounded-xl focus:border-primary outline-none"
+                      autoFocus
+                    />
+                    <button 
+                      onClick={handleSaveCustomCat}
+                      className="bg-primary text-white font-bold px-4 py-3 rounded-xl"
+                    >
+                      Simpan
+                    </button>
+                  </div>
+                )}
               </div>
 
               <Button 

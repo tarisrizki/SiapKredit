@@ -27,6 +27,8 @@ const initialState = {
   chatHistory: [
     { sender: 'sistem', text: 'Halo! Saya asisten SiapKredit. Catat pengeluaran dan pemasukan harian Anda di sini ya. Contoh: "Jual 5 porsi soto @15rb" atau "Beli token listrik 50.000".' }
   ],
+  kategoriCustomMasuk: [],
+  kategoriCustomKeluar: [],
   uiMode: 'simple', // 'simple' or 'pro'
   ui: {
     isOnboarded: false,
@@ -35,6 +37,11 @@ const initialState = {
 
 function appReducer(state, action) {
   switch (action.type) {
+    case 'ADD_KATEGORI':
+      if (action.payload.type === 'pemasukan') {
+        return { ...state, kategoriCustomMasuk: [...new Set([...(state.kategoriCustomMasuk || []), action.payload.name])] };
+      }
+      return { ...state, kategoriCustomKeluar: [...new Set([...(state.kategoriCustomKeluar || []), action.payload.name])] };
     case 'TOGGLE_UI_MODE':
       return { ...state, uiMode: state.uiMode === 'simple' ? 'pro' : 'simple' };
     case 'ADD_TRANSAKSI':

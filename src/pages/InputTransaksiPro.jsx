@@ -3,8 +3,7 @@ import { useAppContext } from '../context/AppContext';
 import { formatRupiah } from '../utils/formatters';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-import { ArrowUpRight, ArrowDownRight, Save, Calendar, Tag, FileText } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowUpRight, ArrowDownRight, Save, Calendar, Tag, FileText, Plus } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export function InputTransaksiPro() {
@@ -18,8 +17,15 @@ export function InputTransaksiPro() {
     date: new Date().toISOString().split('T')[0]
   });
 
+  const [isAddingCustom, setIsAddingCustom] = useState(false);
+  const [customCatText, setCustomCatText] = useState('');
+
   const handleChange = (e) => {
     const { name, value } = e.target;
+    if (name === 'category' && value === 'TAMBAH_BARU') {
+      setIsAddingCustom(true);
+      return;
+    }
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
@@ -29,6 +35,19 @@ export function InputTransaksiPro() {
       type,
       category: type === 'pemasukan' ? 'Penjualan' : 'Operasional'
     }));
+    setIsAddingCustom(false);
+  };
+
+  const handleSaveCustomCat = () => {
+    if(customCatText.trim()) {
+      dispatch({ 
+        type: 'ADD_KATEGORI', 
+        payload: { type: formData.type, name: customCatText.trim() } 
+      });
+      setFormData(prev => ({ ...prev, category: customCatText.trim() }));
+      setIsAddingCustom(false);
+      setCustomCatText('');
+    }
   };
 
   const handleSave = (e) => {
@@ -60,11 +79,18 @@ export function InputTransaksiPro() {
       title: '',
       date: new Date().toISOString().split('T')[0]
     });
+    setIsAddingCustom(false);
   };
 
-  const kategoriMasuk = ['Penjualan', 'Pendanaan', 'Lain-lain'];
-  const kategoriKeluar = ['Operasional', 'Bahan Baku', 'Gaji Karyawan', 'Pajak', 'Lain-lain'];
-  const categories = formData.type === 'pemasukan' ? kategoriMasuk : kategoriKeluar;
+  const baseMasuk = ['Penjualan', 'Pendanaan', 'Lain-lain'];
+  const baseKeluar = ['Operasional', 'Bahan Baku', 'Gaji Karyawan', 'Pajak', 'Lain-lain'];
+  
+  const customMasuk = state.kategoriCustomMasuk || [];
+  const customKeluar = state.kategoriCustomKeluar || [];
+
+  const categories = formData.type === 'pemasukan' 
+    ? [...baseMasuk, ...customMasuk] 
+    : [...baseKeluar, ...customKeluar];
 
   // Ringkasan Hari Ini
   const trxToday = state.transaksi.filter(t => t.date === new Date().toISOString().split('T')[0]);
@@ -135,15 +161,37 @@ export function InputTransaksiPro() {
                 <label className="block text-sm font-bold text-foreground mb-2 flex items-center gap-2">
                   <Tag size={16} /> Kategori Buku Besar
                 </label>
-                <select
-                  name="category"
-                  value={formData.category}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 text-sm border-2 border-border rounded-xl focus:border-primary outline-none transition-all bg-transparent"
-                  required
-                >
-                  {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
-                </select>
+                
+                {!isAddingCustom ? (
+                  <select
+                    name="category"
+                    value={formData.category}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 text-sm border-2 border-border rounded-xl focus:border-primary outline-none transition-all bg-transparent"
+                    required
+                  >
+                    {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                    <option value="TAMBAH_BARU">+ Kategori Baru...</option>
+                  </select>
+                ) : (
+                  <div className="flex gap-2">
+                    <input 
+                      type="text" 
+                      value={customCatText}
+                      onChange={(e) => setCustomCatText(e.target.value)}
+                      placeholder="Ketik kategori..."
+                      className="w-full px-4 py-3 text-sm border-2 border-border rounded-xl focus:border-primary outline-none transition-all bg-transparent"
+                      autoFocus
+                    />
+                    <button 
+                      type="button"
+                      onClick={handleSaveCustomCat}
+                      className="bg-primary text-white font-bold px-4 rounded-xl flex items-center"
+                    >
+                      <Plus size={16} />
+                    </button>
+                  </div>
+                )}
               </div>
 
               {/* Date */}
