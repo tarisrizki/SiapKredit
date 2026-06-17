@@ -1,197 +1,212 @@
-﻿import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
-import { ChatBubble } from '../components/transaction/ChatBubble';
-import { ParsedPreview } from '../components/transaction/ParsedPreview';
-import { parseTransaction } from '../utils/transactionParser';
 import { formatRupiah } from '../utils/formatters';
-import { Send, Edit3, Loader2 } from 'lucide-react';
+import { Card } from '../components/ui/Card';
+import { Button } from '../components/ui/Button';
+import { ArrowUpRight, ArrowDownRight, Save, Calendar, Tag, FileText } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 
-export function InputTransaksi() {
+export function InputTransaksiPro() {
   const { state, dispatch } = useAppContext();
-  const [inputText, setInputText] = useState('');
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [parsedResult, setParsedResult] = useState(null);
   
-  const messagesEndRef = useRef(null);
-  
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  const [formData, setFormData] = useState({
+    type: 'pemasukan', // pemasukan | pengeluaran
+    amount: '',
+    category: 'Penjualan',
+    title: '',
+    date: new Date().toISOString().split('T')[0]
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [state.chatHistory, parsedResult]);
+  const handleTypeChange = (type) => {
+    setFormData(prev => ({
+      ...prev,
+      type,
+      category: type === 'pemasukan' ? 'Penjualan' : 'Operasional'
+    }));
+  };
 
-  const handleSubmit = (e) => {
+  const handleSave = (e) => {
     e.preventDefault();
-    if (!inputText.trim() || isProcessing || parsedResult) return;
+    if (!formData.amount || parseInt(formData.amount) <= 0) {
+      toast.error('Nominal harus lebih dari 0');
+      return;
+    }
 
-    const userText = inputText.trim();
-    setInputText('');
-    
-    // Add User Message
-    dispatch({
-      type: 'ADD_CHAT_MESSAGE',
-      payload: { sender: 'user', text: userText }
-    });
-
-    setIsProcessing(true);
-    
-    // Simulate slight delay for "AI" processing feel
-    setTimeout(() => {
-      const result = parseTransaction(userText);
-      setIsProcessing(false);
-
-      if (result) {
-        setParsedResult(result);
-      } else {
-        dispatch({
-          type: 'ADD_CHAT_MESSAGE',
-          payload: { 
-            sender: 'sistem', 
-            text: 'Hmm, saya kurang mengerti nominal atau transaksinya. Coba format seperti: "Jual baju 50rb" atau "Bayar listrik 150.000".' 
-          }
-        });
-      }
-    }, 600);
-  };
-
-  const handleSave = (data) => {
     const newTrx = {
-      ...data,
       id: `trx-${Date.now()}`,
       createdAt: Date.now(),
-      isManual: false
+      date: formData.date,
+      type: formData.type,
+      amount: parseInt(formData.amount),
+      category: formData.category,
+      title: formData.title || formData.category,
+      isManual: true
     };
 
     dispatch({ type: 'ADD_TRANSAKSI', payload: newTrx });
-    setParsedResult(null);
-    
-    dispatch({
-      type: 'ADD_CHAT_MESSAGE',
-      payload: { sender: 'sistem', text: `Sip! Transaksi ${data.type} sebesar ${formatRupiah(data.amount)} berhasil dicatat.` }
-    });
+    toast.success('Transaksi berhasil dicatat');
 
-    toast.success('Transaksi disimpan! Skor kredit Anda diperbarui.');
-  };
-
-  const handleEdit = () => {
-    // Ideally this opens a full form modal.
-    // For simplicity, we just reject it and ask user to type again.
-    setParsedResult(null);
-    dispatch({
-      type: 'ADD_CHAT_MESSAGE',
-      payload: { sender: 'sistem', text: 'Baik, silakan ketik ulang detail transaksinya.' }
+    // Reset
+    setFormData({
+      type: 'pemasukan',
+      amount: '',
+      category: 'Penjualan',
+      title: '',
+      date: new Date().toISOString().split('T')[0]
     });
   };
 
-  // Hitung ringkasan hari ini
-  const today = new Date().toISOString().split('T')[0];
-  const trxToday = state.transaksi.filter(t => t.date === today);
+  const kategoriMasuk = ['Penjualan', 'Pendanaan', 'Lain-lain'];
+  const kategoriKeluar = ['Operasional', 'Bahan Baku', 'Gaji Karyawan', 'Pajak', 'Lain-lain'];
+  const categories = formData.type === 'pemasukan' ? kategoriMasuk : kategoriKeluar;
+
+  // Ringkasan Hari Ini
+  const trxToday = state.transaksi.filter(t => t.date === new Date().toISOString().split('T')[0]);
   const inToday = trxToday.filter(t => t.type === 'pemasukan').reduce((a, b) => a + b.amount, 0);
   const outToday = trxToday.filter(t => t.type === 'pengeluaran').reduce((a, b) => a + b.amount, 0);
-  const netToday = inToday - outToday;
 
   return (
-    <div className="max-w-3xl mx-auto h-[calc(100vh-64px)] flex flex-col md:flex-row bg-white sm:border-x sm:border-gray-200 shadow-sm">
+    <div className="max-w-4xl mx-auto flex flex-col md:flex-row gap-6 p-4 sm:p-6 pb-24">
       
-      {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col relative h-full">
-        <div className="p-4 border-b border-gray-100 bg-white/80 backdrop-blur sticky top-0 z-10 flex justify-between items-center">
-           <div>
-             <h2 className="font-bold text-gray-900">Catat Transaksi</h2>
-             <p className="text-xs text-gray-500">Ketik apa saja dengan bahasa sehari-hari</p>
-           </div>
-           {/* Mobile summary quick peek */}
-           <div className="md:hidden text-right">
-              <p className="text-xs font-medium text-success-600">In: {formatRupiah(inToday)}</p>
-              <p className="text-xs font-medium text-danger-600">Out: {formatRupiah(outToday)}</p>
-           </div>
+      {/* Form Area */}
+      <div className="flex-1">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-foreground">Pencatatan Keuangan</h1>
+          <p className="text-muted-foreground text-sm mt-1">Gunakan formulir ini untuk mencatat jurnal transaksi secara presisi.</p>
         </div>
 
-        {/* Chat History */}
-        <div className="flex-1 overflow-y-auto p-4 bg-slate-50">
-          {state.chatHistory.map((msg, idx) => (
-            <ChatBubble key={idx} message={msg} />
-          ))}
-          
-          {isProcessing && (
-            <div className="flex w-full mb-4 justify-start">
-              <div className="bg-white px-4 py-3 rounded-2xl rounded-tl-none border border-gray-200 shadow-sm">
-                <Loader2 size={18} className="animate-spin text-brand-500" />
+        <Card className="p-6 shadow-sm border-2">
+          <form onSubmit={handleSave} className="space-y-6">
+            
+            {/* Type Selector */}
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                type="button"
+                onClick={() => handleTypeChange('pemasukan')}
+                className={`flex items-center justify-center gap-2 p-4 rounded-xl border-2 font-bold transition-all ${
+                  formData.type === 'pemasukan' 
+                    ? 'border-success-500 bg-success-50 text-success-700' 
+                    : 'border-border bg-transparent text-muted-foreground hover:bg-muted'
+                }`}
+              >
+                <ArrowUpRight size={20} />
+                Pemasukan (Kredit)
+              </button>
+              <button
+                type="button"
+                onClick={() => handleTypeChange('pengeluaran')}
+                className={`flex items-center justify-center gap-2 p-4 rounded-xl border-2 font-bold transition-all ${
+                  formData.type === 'pengeluaran' 
+                    ? 'border-danger-500 bg-danger-50 text-danger-700' 
+                    : 'border-border bg-transparent text-muted-foreground hover:bg-muted'
+                }`}
+              >
+                <ArrowDownRight size={20} />
+                Pengeluaran (Debit)
+              </button>
+            </div>
+
+            {/* Amount */}
+            <div>
+              <label className="block text-sm font-bold text-foreground mb-2">Nominal Transaksi (Rp)</label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground font-bold">Rp</span>
+                <input
+                  type="number"
+                  name="amount"
+                  value={formData.amount}
+                  onChange={handleChange}
+                  className="w-full pl-12 pr-4 py-3 text-lg font-bold border-2 border-border rounded-xl focus:border-primary focus:ring-4 focus:ring-primary/20 outline-none transition-all"
+                  placeholder="0"
+                  required
+                />
               </div>
             </div>
-          )}
 
-          {parsedResult && (
-            <ParsedPreview 
-              parsedData={parsedResult} 
-              onSave={handleSave} 
-              onEdit={handleEdit} 
-            />
-          )}
-          <div ref={messagesEndRef} />
-        </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Category */}
+              <div>
+                <label className="block text-sm font-bold text-foreground mb-2 flex items-center gap-2">
+                  <Tag size={16} /> Kategori Buku Besar
+                </label>
+                <select
+                  name="category"
+                  value={formData.category}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 text-sm border-2 border-border rounded-xl focus:border-primary outline-none transition-all bg-transparent"
+                  required
+                >
+                  {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                </select>
+              </div>
 
-        {/* Input Area */}
-        <div className="p-3 bg-white border-t border-gray-200">
-           {/* Quick shortcuts */}
-           <div className="flex gap-2 mb-3 overflow-x-auto pb-1 hide-scrollbar">
-             <button onClick={() => setInputText('Jual ... Rp ...')} className="shrink-0 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 py-1.5 px-3 rounded-full transition-colors">+ Penjualan</button>
-             <button onClick={() => setInputText('Bayar listrik ...')} className="shrink-0 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 py-1.5 px-3 rounded-full transition-colors">+ Pengeluaran</button>
-             <button onClick={() => setInputText('Beli stok bahan ...')} className="shrink-0 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 py-1.5 px-3 rounded-full transition-colors">+ HPP</button>
-           </div>
+              {/* Date */}
+              <div>
+                <label className="block text-sm font-bold text-foreground mb-2 flex items-center gap-2">
+                  <Calendar size={16} /> Tanggal Transaksi
+                </label>
+                <input
+                  type="date"
+                  name="date"
+                  value={formData.date}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 text-sm border-2 border-border rounded-xl focus:border-primary outline-none transition-all bg-transparent"
+                  required
+                />
+              </div>
+            </div>
 
-          <form onSubmit={handleSubmit} className="flex gap-2 items-end">
-            <div className="flex-1 bg-gray-100 rounded-2xl border border-transparent focus-within:border-brand-500 focus-within:bg-white transition-all overflow-hidden">
-              <textarea
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSubmit(e);
-                  }
-                }}
-                placeholder="Ketik transaksi di sini..."
-                className="w-full bg-transparent p-3 max-h-32 min-h-[44px] resize-none focus:outline-none text-sm"
-                rows={1}
-                disabled={parsedResult !== null}
+            {/* Description */}
+            <div>
+              <label className="block text-sm font-bold text-foreground mb-2 flex items-center gap-2">
+                <FileText size={16} /> Keterangan (Opsional)
+              </label>
+              <input
+                type="text"
+                name="title"
+                value={formData.title}
+                onChange={handleChange}
+                className="w-full px-4 py-3 text-sm border-2 border-border rounded-xl focus:border-primary outline-none transition-all"
+                placeholder="Contoh: Pembayaran invoice #001"
               />
             </div>
-            <button
-              type="submit"
-              disabled={!inputText.trim() || parsedResult !== null}
-              className="bg-brand-500 text-white p-3 rounded-full hover:bg-brand-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shrink-0"
-            >
-              <Send size={20} />
-            </button>
+
+            <Button type="submit" className="w-full py-4 text-base font-bold rounded-xl flex items-center justify-center gap-2">
+              <Save size={18} /> Simpan Transaksi
+            </Button>
           </form>
-        </div>
+        </Card>
       </div>
 
-      {/* Sidebar Summary (Desktop) */}
-      <div className="hidden md:flex flex-col w-64 bg-gray-50 border-l border-gray-200 p-4">
-        <h3 className="font-bold text-gray-900 mb-4">Hari Ini</h3>
-        
-        <div className="space-y-4">
-          <div className="bg-white p-3 rounded-lg border border-gray-200 shadow-sm">
-            <p className="text-xs text-gray-500 mb-1">Pemasukan</p>
-            <p className="text-lg font-bold text-success-600">{formatRupiah(inToday)}</p>
-          </div>
-          
-          <div className="bg-white p-3 rounded-lg border border-gray-200 shadow-sm">
-            <p className="text-xs text-gray-500 mb-1">Pengeluaran</p>
-            <p className="text-lg font-bold text-danger-600">{formatRupiah(outToday)}</p>
-          </div>
-          
-          <div className={`p-3 rounded-lg border ${netToday >= 0 ? 'bg-brand-50 border-brand-200' : 'bg-red-50 border-red-200'}`}>
-            <p className="text-xs text-gray-600 mb-1">Saldo Bersih</p>
-            <p className={`text-xl font-bold ${netToday >= 0 ? 'text-brand-700' : 'text-danger-700'}`}>
-              {formatRupiah(netToday)}
-            </p>
-          </div>
+      {/* Sidebar Summary */}
+      <div className="w-full md:w-80">
+        <div className="sticky top-24">
+          <Card className="p-5 border-2 shadow-sm bg-muted/30">
+            <h3 className="font-bold text-foreground mb-4">Ringkasan Hari Ini</h3>
+            
+            <div className="space-y-4">
+              <div className="flex justify-between items-center p-3 bg-background rounded-lg border">
+                <span className="text-sm text-muted-foreground font-medium">In (Kredit)</span>
+                <span className="font-bold text-success-600">{formatRupiah(inToday)}</span>
+              </div>
+              <div className="flex justify-between items-center p-3 bg-background rounded-lg border">
+                <span className="text-sm text-muted-foreground font-medium">Out (Debit)</span>
+                <span className="font-bold text-danger-600">{formatRupiah(outToday)}</span>
+              </div>
+              <div className="pt-4 border-t-2 border-border flex justify-between items-center">
+                <span className="text-sm font-bold text-foreground">Net Hari Ini</span>
+                <span className={`font-black ${inToday - outToday >= 0 ? 'text-primary' : 'text-danger-600'}`}>
+                  {formatRupiah(inToday - outToday)}
+                </span>
+              </div>
+            </div>
+          </Card>
         </div>
       </div>
 
