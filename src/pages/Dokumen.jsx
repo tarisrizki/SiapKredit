@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAppContext } from '../context/AppContext';
-import { DokumenSimple } from './DokumenSimple';
-import { DokumenPro } from './DokumenPro';
+import { Dokumen as DokumenSimple } from './DokumenSimple';
+import { Dokumen as DokumenPro } from './DokumenPro';
 
 export function Dokumen() {
   const { state } = useAppContext();

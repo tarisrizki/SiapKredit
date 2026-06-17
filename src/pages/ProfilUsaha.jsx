@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAppContext } from '../context/AppContext';
-import { ProfilUsahaSimple } from './ProfilUsahaSimple';
-import { ProfilUsahaPro } from './ProfilUsahaPro';
+import { ProfilUsaha as ProfilUsahaSimple } from './ProfilUsahaSimple';
+import { ProfilUsaha as ProfilUsahaPro } from './ProfilUsahaPro';
 
 export function ProfilUsaha() {
   const { state } = useAppContext();
