@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply font-sans bg-[#F8F9FA] text-[#111827];
+  }
+}
+
+@media print {
+  .no-print { display: none !important; }
+  .print-header::before {
+    content: "SiapKredit — Laporan Keuangan";
+    display: block;
+    font-size: 20px;
+    font-weight: bold;
+  }
+}
