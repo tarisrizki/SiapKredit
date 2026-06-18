@@ -4,12 +4,12 @@
 
 ## Fitur Utama
 
-- **Input Transaksi Natural (Mode Simple)**: UMKM tidak perlu memiliki latar belakang akuntansi. Cukup ketik transaksi sehari-hari (contoh: "Jual 5 porsi soto @15rb"), dan sistem akan otomatis mengonversinya menjadi format laporan keuangan standar.
-- **Mode Profesional**: Menyediakan antarmuka pencatatan tingkat lanjut untuk UMKM yang membutuhkan input transaksi mendetail (pemasukan, pengeluaran operasional, dan transfer).
-- **Dasbor & Laporan Otomatis**: Laporan Laba/Rugi, Arus Kas, dan Tren Pemasukan dihitung secara otomatis secara langsung (real-time). Laporan ini dapat dicetak ke format PDF sebagai lampiran untuk pihak bank.
-- **Skor Kesiapan Bank (KUR)**: Sistem skoring cerdas yang mengevaluasi kesiapan UMKM untuk mengajukan pinjaman berdasarkan standar nyata perbankan (meliputi parameter Omset, Laba, Usia Usaha, dan kelengkapan legalitas seperti NIB/NPWP).
-- **Konsultan AI Terintegrasi**: Didukung oleh teknologi Google Gemini 2.5 Flash, fitur ini memberikan analisis mendalam secara personal, persentase probabilitas kelulusan pinjaman, serta rekomendasi langkah konkret untuk memperbaiki profil keuangan UMKM.
-- **Manajemen Ceklis Dokumen**: Memastikan kelengkapan administrasi UMKM terorganisir dengan baik sebelum melakukan pengajuan kredit fisik.
+- **Input Transaksi Natural & Profesional**: Tersedia Mode Simple untuk mencatat semudah melakukan *chatting* ("Jual soto 15rb"), serta Mode Pro untuk input detail (kategorisasi, tanggal, dan deskripsi khusus).
+- **Dashboard Keuangan & Laporan Cetak**: Menyajikan visualisasi arus kas bulanan (Bar Chart), proporsi pengeluaran (Pie Chart), serta rekap Laba/Rugi yang dapat langsung dicetak (PDF) untuk dilampirkan ke pihak bank.
+- **Simulasi Skor Kredit**: Sistem cerdas yang menghitung skor kelayakan UMKM untuk mengajukan pinjaman berdasarkan riwayat omset, laba operasional, usia usaha, dan validasi kelengkapan dokumen.
+- **Konsultan AI Terintegrasi**: Didukung teknologi Google Gemini 2.5 Flash, fitur ini menganalisis seluruh data keuangan dan memberikan surat rekomendasi konkret langkah apa saja yang harus dilakukan untuk meningkatkan persetujuan bank.
+- **Manajemen Dokumen**: Ceklis interaktif yang mengorganisir dokumen wajib perbankan seperti NIB, NPWP, KTP, dan SKU agar tersusun rapi.
+- **Panduan Pinjaman KUR**: Modul edukasi terintegrasi yang menjelaskan perbedaan jenis-jenis KUR (Super Mikro, Mikro, Kecil) beserta syarat pendaftaran lengkapnya.
 - **Arsitektur Offline-First & Aman**: Seluruh data transaksi disimpan secara aman di dalam *local storage* browser pengguna. Privasi data finansial terjamin karena tidak dikirim ke peladen (server) pihak ketiga.
 
 ## Teknologi yang Digunakan
