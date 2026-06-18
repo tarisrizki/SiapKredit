@@ -8,7 +8,7 @@
 - **Dashboard Keuangan & Laporan Cetak**: Menyajikan visualisasi arus kas bulanan (Bar Chart), proporsi pengeluaran (Pie Chart), serta rekap Laba/Rugi yang dapat langsung dicetak (PDF) untuk dilampirkan ke pihak bank.
 - **Simulasi Skor Kredit**: Sistem cerdas yang menghitung skor kelayakan UMKM untuk mengajukan pinjaman berdasarkan riwayat omset, laba operasional, usia usaha, dan validasi kelengkapan dokumen.
 - **Konsultan AI Terintegrasi**: Didukung teknologi Google Gemini 2.5 Flash, fitur ini menganalisis seluruh data keuangan dan memberikan surat rekomendasi konkret langkah apa saja yang harus dilakukan untuk meningkatkan persetujuan bank.
-- **Manajemen Dokumen**: Ceklis interaktif yang mengorganisir dokumen wajib perbankan seperti NIB, NPWP, KTP, dan SKU agar tersusun rapi.
+- **Manajemen Dokumen**: Ceklis interaktif yang mengorganisir dokumen wajib dan pendukung perbankan seperti e-KTP, Kartu Keluarga (KK), NIB (sebagai pengganti SKU), NPWP, hingga BPJS Ketenagakerjaan agar tersusun rapi.
 - **Panduan Pinjaman KUR**: Modul edukasi terintegrasi yang menjelaskan perbedaan jenis-jenis KUR (Super Mikro, Mikro, Kecil) beserta syarat pendaftaran lengkapnya.
 - **Arsitektur Offline-First & Aman**: Seluruh data transaksi disimpan secara aman di dalam *local storage* browser pengguna. Privasi data finansial terjamin karena tidak dikirim ke peladen (server) pihak ketiga.
 
