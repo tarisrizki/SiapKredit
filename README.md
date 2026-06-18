@@ -49,8 +49,3 @@
 
 5. **Akses Aplikasi**
    Buka `http://localhost:5173` di browser Anda.
-
-## Lisensi & Kontribusi
-
-Proyek ini dibuat dan dikembangkan sebagai wujud dedikasi untuk mempercepat digitalisasi UMKM di Indonesia. 
-Hak Cipta (c) 2026 **tarisrizki**.
