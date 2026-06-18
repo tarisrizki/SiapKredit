@@ -9,8 +9,8 @@ export function Footer() {
           <span className="text-xl font-black tracking-tighter text-foreground">Siap<span className="text-primary">Kredit</span></span>
         </div>
         
-        <p className="text-sm text-muted-foreground flex items-center justify-center gap-1.5 font-medium">
-          Dibuat dengan <Heart size={14} className="text-danger-500 fill-danger-500" /> untuk UMKM Indonesia
+        <p className="text-sm text-muted-foreground font-medium">
+          &copy; {new Date().getFullYear()} SiapKredit
         </p>
       </div>
     </footer>

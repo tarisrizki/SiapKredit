@@ -25,12 +25,12 @@ export function DocumentItem({ doc, isDone, onToggle }) {
               )}
               {doc.wajib && (
                 <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-warning-50 text-warning-700 border border-warning-200">
-                  ⚠️ WAJIB
+                  WAJIB
                 </span>
               )}
               {isDone && (
                 <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-success-50 text-success-700 border border-success-200">
-                  ✅ SELESAI
+                  SELESAI
                 </span>
               )}
             </div>

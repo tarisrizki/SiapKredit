@@ -2,6 +2,7 @@ import React from 'react';
 import { useScore } from '../hooks/useScore';
 import { useAppContext } from '../context/AppContext';
 import { Card } from '../components/ui/Card';
+import { AIKonsultasi } from '../components/score/AIKonsultasi';
 import { motion } from 'framer-motion';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -107,6 +108,7 @@ export function SkorKredit() {
         )}
       </div>
 
+      <AIKonsultasi />
     </div>
   );
 }

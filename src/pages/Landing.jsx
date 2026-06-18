@@ -29,7 +29,8 @@ export function Landing() {
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <div className="relative overflow-hidden pt-16 pb-24 lg:pt-32 lg:pb-40">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-brand-50 via-background to-background -z-10" />
+        <div className="absolute inset-0 bg-gradient-to-b from-brand-50 via-white to-background -z-10" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-brand-100/50 via-transparent to-transparent -z-10" />
         
         <motion.div 
           variants={containerVariants}

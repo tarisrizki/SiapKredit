@@ -1,10 +1,11 @@
-﻿import React from 'react';
+import React from 'react';
 import { useScore } from '../hooks/useScore';
 import { useAppContext } from '../context/AppContext';
 import { ScoreHeader } from '../components/score/ScoreHeader';
 import { DimensionBreakdown } from '../components/score/DimensionBreakdown';
 import { BankRecommendation } from '../components/score/BankRecommendation';
 import { ActionPlan } from '../components/score/ActionPlan';
+import { AIKonsultasi } from '../components/score/AIKonsultasi';
 
 export function SkorKredit() {
   const scoreResult = useScore();
@@ -25,6 +26,7 @@ export function SkorKredit() {
       
       <ActionPlan scoreResult={scoreResult} dokumen={state.dokumen} profil={state.profil} />
       
+      <AIKonsultasi />
     </div>
   );
 }
