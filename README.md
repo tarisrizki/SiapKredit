@@ -4,7 +4,7 @@
 
 ## Fitur Utama
 
-- **Input Transaksi Natural & Profesional**: Tersedia Mode Simple untuk mencatat semudah melakukan *chatting* ("Jual soto 15rb"), serta Mode Pro untuk input detail (kategorisasi, tanggal, dan deskripsi khusus).
+- **Input Transaksi Natural & Profesional**: Tersedia **Mode Simple** dengan antarmuka kalkulator/numpad besar yang sangat intuitif untuk mencatat uang masuk/keluar dalam hitungan detik, serta **Mode Pro** untuk pencatatan jurnal detail (tanggal spesifik, kategorisasi kustom, dan deskripsi khusus).
 - **Dashboard Keuangan & Laporan Cetak**: Menyajikan visualisasi arus kas bulanan (Bar Chart), proporsi pengeluaran (Pie Chart), serta rekap Laba/Rugi yang dapat langsung dicetak (PDF) untuk dilampirkan ke pihak bank.
 - **Simulasi Skor Kredit**: Sistem cerdas yang menghitung skor kelayakan UMKM untuk mengajukan pinjaman berdasarkan riwayat omset, laba operasional, usia usaha, dan validasi kelengkapan dokumen.
 - **Konsultan AI Terintegrasi**: Didukung teknologi Google Gemini 2.5 Flash, fitur ini menganalisis seluruh data keuangan dan memberikan surat rekomendasi konkret langkah apa saja yang harus dilakukan untuk meningkatkan persetujuan bank.
