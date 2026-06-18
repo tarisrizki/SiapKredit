@@ -16,6 +16,8 @@ const SkorKredit = lazy(() => import('./pages/SkorKredit').then(m => ({ default:
 const Dokumen = lazy(() => import('./pages/Dokumen').then(m => ({ default: m.Dokumen })));
 const PanduanKUR = lazy(() => import('./pages/PanduanKUR').then(m => ({ default: m.PanduanKUR })));
 const ProfilUsaha = lazy(() => import('./pages/ProfilUsaha').then(m => ({ default: m.ProfilUsaha })));
+const Login = lazy(() => import('./pages/Login').then(m => ({ default: m.Login })));
+import { ProtectedRoute } from './components/auth/ProtectedRoute';
 
 // Loading Fallback Component
 const PageLoading = () => (
@@ -54,13 +56,17 @@ function AnimatedRoutes() {
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
+        <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
+        
+        {/* Protected Routes */}
         <Route path="/" element={<PageWrapper><Landing /></PageWrapper>} />
-        <Route path="/input" element={<PageWrapper><InputTransaksi /></PageWrapper>} />
-        <Route path="/dashboard" element={<PageWrapper><Dashboard /></PageWrapper>} />
-        <Route path="/skor" element={<PageWrapper><SkorKredit /></PageWrapper>} />
-        <Route path="/dokumen" element={<PageWrapper><Dokumen /></PageWrapper>} />
-        <Route path="/kur" element={<PageWrapper><PanduanKUR /></PageWrapper>} />
-        <Route path="/profil" element={<PageWrapper><ProfilUsaha /></PageWrapper>} />
+        <Route path="/input" element={<ProtectedRoute><PageWrapper><InputTransaksi /></PageWrapper></ProtectedRoute>} />
+        <Route path="/dashboard" element={<ProtectedRoute><PageWrapper><Dashboard /></PageWrapper></ProtectedRoute>} />
+        <Route path="/skor" element={<ProtectedRoute><PageWrapper><SkorKredit /></PageWrapper></ProtectedRoute>} />
+        <Route path="/dokumen" element={<ProtectedRoute><PageWrapper><Dokumen /></PageWrapper></ProtectedRoute>} />
+        <Route path="/kur" element={<ProtectedRoute><PageWrapper><PanduanKUR /></PageWrapper></ProtectedRoute>} />
+        <Route path="/profil" element={<ProtectedRoute><PageWrapper><ProfilUsaha /></PageWrapper></ProtectedRoute>} />
+        
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </AnimatePresence>

@@ -6,7 +6,7 @@ export function DocumentProgress({ dokumen, documentList }) {
   const completedWajib = documentList.filter(d => d.wajib && dokumen[d.id]).length;
   
   const total = documentList.length;
-  const completed = Object.values(dokumen).filter(Boolean).length;
+  const completed = documentList.filter(doc => dokumen[doc.id]).length;
   
   const percentage = Math.round((completed / total) * 100);
 

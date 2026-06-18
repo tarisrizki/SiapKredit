@@ -109,24 +109,24 @@ export function InputTransaksiSimple() {
           >
             <button 
               onClick={() => handleTypeSelect('masuk')}
-              className="bg-success-50 hover:bg-success-100 border-2 border-success-500 rounded-3xl p-8 flex flex-col items-center justify-center gap-4 transition-all shadow-lg active:scale-95"
+              className="bg-success-50 hover:bg-success-100 border border-success-500 rounded-2xl p-6 flex flex-col items-center justify-center gap-3 transition-all shadow-md active:scale-95"
             >
-              <div className="bg-success-500 text-white p-4 rounded-full">
-                <ArrowUpCircle size={64} />
+              <div className="bg-success-500 text-white p-3 rounded-full">
+                <ArrowUpCircle size={48} />
               </div>
-              <span className="text-3xl font-black text-success-700">Uang Masuk</span>
-              <span className="text-success-600 font-medium text-lg">Contoh: Jualan, Terima Uang</span>
+              <span className="text-2xl font-bold text-success-700">Uang Masuk</span>
+              <span className="text-success-600 font-medium text-base">Contoh: Jualan, Terima Uang</span>
             </button>
 
             <button 
               onClick={() => handleTypeSelect('keluar')}
-              className="bg-danger-50 hover:bg-danger-100 border-2 border-danger-500 rounded-3xl p-8 flex flex-col items-center justify-center gap-4 transition-all shadow-lg active:scale-95"
+              className="bg-danger-50 hover:bg-danger-100 border border-danger-500 rounded-2xl p-6 flex flex-col items-center justify-center gap-3 transition-all shadow-md active:scale-95"
             >
-              <div className="bg-danger-500 text-white p-4 rounded-full">
-                <ArrowDownCircle size={64} />
+              <div className="bg-danger-500 text-white p-3 rounded-full">
+                <ArrowDownCircle size={48} />
               </div>
-              <span className="text-3xl font-black text-danger-700">Uang Keluar</span>
-              <span className="text-danger-600 font-medium text-lg">Contoh: Beli Barang, Bayar Gaji</span>
+              <span className="text-2xl font-bold text-danger-700">Uang Keluar</span>
+              <span className="text-danger-600 font-medium text-base">Contoh: Beli Barang, Bayar Gaji</span>
             </button>
           </motion.div>
         ) : (
@@ -138,41 +138,41 @@ export function InputTransaksiSimple() {
             className="flex flex-col gap-4"
           >
             <div className="flex justify-between items-center mb-2">
-              <button onClick={() => setActiveTab(null)} className="text-muted-foreground p-2 rounded-full hover:bg-muted text-lg font-bold">
+              <button onClick={() => setActiveTab(null)} className="text-muted-foreground p-2 rounded-full hover:bg-muted text-base font-bold">
                 ← Kembali
               </button>
-              <span className={`text-xl font-black px-4 py-1.5 rounded-full ${activeTab === 'masuk' ? 'bg-success-100 text-success-700' : 'bg-danger-100 text-danger-700'}`}>
+              <span className={`text-lg font-bold px-3 py-1 rounded-full ${activeTab === 'masuk' ? 'bg-success-100 text-success-700' : 'bg-danger-100 text-danger-700'}`}>
                 {activeTab === 'masuk' ? 'UANG MASUK' : 'UANG KELUAR'}
               </span>
             </div>
 
-            <Card className="p-6 border-2 shadow-md">
-              <p className="text-center text-muted-foreground font-bold mb-2">Jumlah (Rupiah)</p>
-              <div className="text-center text-4xl sm:text-5xl font-black text-foreground mb-6 overflow-x-auto whitespace-nowrap">
+            <Card className="p-5 border shadow-sm">
+              <p className="text-center text-muted-foreground font-bold mb-1">Jumlah (Rupiah)</p>
+              <div className="text-center text-3xl sm:text-4xl font-black text-foreground mb-4 overflow-x-auto whitespace-nowrap">
                 {amount ? formatRupiah(parseInt(amount)) : 'Rp 0'}
               </div>
 
               {/* Simple Numpad */}
-              <div className="grid grid-cols-3 gap-3 mb-6">
+              <div className="grid grid-cols-3 gap-2 mb-5">
                 {['1','2','3','4','5','6','7','8','9','000','0'].map((num) => (
                   <button 
                     key={num} 
                     onClick={() => handleNumClick(num)}
-                    className="bg-muted hover:bg-muted/80 active:bg-muted/50 rounded-2xl p-4 text-2xl font-bold text-foreground transition-colors"
+                    className="bg-muted hover:bg-muted/80 active:bg-muted/50 rounded-xl p-3 text-xl font-bold text-foreground transition-colors"
                   >
                     {num}
                   </button>
                 ))}
                 <button 
                   onClick={handleDelete}
-                  className="bg-danger-50 hover:bg-danger-100 text-danger-600 rounded-2xl p-4 flex items-center justify-center transition-colors"
+                  className="bg-danger-50 hover:bg-danger-100 text-danger-600 rounded-xl p-3 flex items-center justify-center transition-colors"
                 >
-                  <X size={32} />
+                  <X size={24} />
                 </button>
               </div>
 
-              <div className="mb-6">
-                <p className="font-bold text-lg mb-3">Pilih Kategori:</p>
+              <div className="mb-5">
+                <p className="font-bold text-base mb-2">Pilih Kategori:</p>
                 <div className="flex flex-wrap gap-2">
                   {categories.map((cat) => (
                     <button
@@ -181,7 +181,7 @@ export function InputTransaksiSimple() {
                         setCategory(cat);
                         setIsAddingCustom(false);
                       }}
-                      className={`px-4 py-3 rounded-xl text-lg font-bold transition-all border-2 ${
+                      className={`px-3 py-2 rounded-lg text-sm font-semibold transition-all border ${
                         category === cat 
                           ? 'bg-primary text-primary-foreground border-primary' 
                           : 'bg-background border-border text-muted-foreground'
@@ -194,26 +194,26 @@ export function InputTransaksiSimple() {
                   {!isAddingCustom && (
                     <button
                       onClick={() => setIsAddingCustom(true)}
-                      className="px-4 py-3 rounded-xl text-lg font-bold border-2 border-dashed border-border text-muted-foreground hover:bg-muted transition-all flex items-center gap-1"
+                      className="px-3 py-2 rounded-lg text-sm font-semibold border border-dashed border-border text-muted-foreground hover:bg-muted transition-all flex items-center gap-1"
                     >
-                      <Plus size={20} /> Lainnya
+                      <Plus size={16} /> Lainnya
                     </button>
                   )}
                 </div>
 
                 {isAddingCustom && (
-                  <div className="mt-4 flex gap-2">
+                  <div className="mt-3 flex gap-2">
                     <input 
                       type="text" 
                       value={customCatText}
                       onChange={(e) => setCustomCatText(e.target.value)}
                       placeholder="Ketik kategori baru..."
-                      className="flex-1 px-4 py-3 text-lg font-bold border-2 border-border rounded-xl focus:border-primary outline-none"
+                      className="flex-1 px-3 py-2 text-sm font-semibold border border-border rounded-lg focus:border-primary outline-none"
                       autoFocus
                     />
                     <button 
                       onClick={handleSaveCustomCat}
-                      className="bg-primary text-white font-bold px-4 py-3 rounded-xl"
+                      className="bg-primary text-white font-semibold px-3 py-2 rounded-lg text-sm"
                     >
                       Simpan
                     </button>
@@ -223,7 +223,7 @@ export function InputTransaksiSimple() {
 
               <Button 
                 onClick={handleSave} 
-                className={`w-full py-8 text-2xl font-black rounded-2xl shadow-xl ${activeTab === 'masuk' ? 'bg-success-500 hover:bg-success-600' : 'bg-danger-500 hover:bg-danger-600'}`}
+                className={`w-full py-4 text-xl font-bold rounded-xl shadow-md ${activeTab === 'masuk' ? 'bg-success-500 hover:bg-success-600' : 'bg-danger-500 hover:bg-danger-600'}`}
               >
                 SIMPAN CATATAN
               </Button>

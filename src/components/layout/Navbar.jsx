@@ -1,12 +1,34 @@
-import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { TrendingUp, Menu, X, MessageSquare, LayoutDashboard, Award, FileCheck, BookOpen, Settings, Zap } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { TrendingUp, Menu, X, MessageSquare, LayoutDashboard, Award, FileCheck, BookOpen, Settings, Zap, LogOut } from 'lucide-react';
 import { useAppContext } from '../../context/AppContext';
+import { supabase, isSupabaseConfigured } from '../../lib/supabase';
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [session, setSession] = useState(null);
   const location = useLocation();
+  const navigate = useNavigate();
   const { state, dispatch } = useAppContext();
+
+  useEffect(() => {
+    if (isSupabaseConfigured()) {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        setSession(session);
+      });
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        setSession(session);
+      });
+      return () => subscription?.unsubscribe();
+    }
+  }, []);
+
+  const handleLogout = async () => {
+    if (isSupabaseConfigured()) {
+      await supabase.auth.signOut();
+      navigate('/login');
+    }
+  };
 
   const toggleMode = () => {
     dispatch({ type: 'TOGGLE_UI_MODE' });
@@ -35,8 +57,9 @@ export function Navbar() {
             </div>
             
             {/* Desktop Menu */}
-        <div className="hidden md:flex md:items-center md:space-x-4">
-          <div className="flex bg-muted/50 p-1 rounded-full items-center mr-2 border border-border">
+        {session && (
+          <div className="hidden md:flex md:items-center md:space-x-4">
+            <div className="flex bg-muted/50 p-1 rounded-full items-center mr-2 border border-border">
             <button 
               onClick={() => state.uiMode !== 'simple' && toggleMode()}
               className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${state.uiMode === 'simple' ? 'bg-background shadow-sm text-primary' : 'text-muted-foreground hover:text-foreground'}`}
@@ -69,18 +92,30 @@ export function Navbar() {
               {link.name}
             </Link>
           ))}
+          {isSupabaseConfigured() && (
+            <button
+              onClick={handleLogout}
+              className="flex items-center px-3 py-2 rounded-md text-sm font-medium text-danger-500 hover:bg-danger-50 transition-colors"
+              title="Keluar"
+            >
+              <LogOut size={18} />
+            </button>
+          )}
         </div>
+        )}
 
             {/* Mobile menu button */}
-            <div className="flex items-center md:hidden">
-              <button
-                onClick={() => setIsOpen(true)}
-                className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-500 min-w-[44px] min-h-[44px]"
-              >
-                <span className="sr-only">Buka menu utama</span>
-                <Menu size={24} />
-              </button>
-            </div>
+            {session && (
+              <div className="flex items-center md:hidden">
+                <button
+                  onClick={() => setIsOpen(true)}
+                  className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-500 min-w-[44px] min-h-[44px]"
+                >
+                  <span className="sr-only">Buka menu utama</span>
+                  <Menu size={24} />
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </nav>
@@ -133,7 +168,7 @@ export function Navbar() {
                   <Settings size={16} /> Pro
                 </button>
               </div>
-              <div className="mt-8 px-4">
+              <div className="mt-8 px-4 flex flex-col gap-2">
                  <Link
                   to="/profil"
                   onClick={() => setIsOpen(false)}
@@ -141,6 +176,14 @@ export function Navbar() {
                 >
                   Profil Usaha
                 </Link>
+                {isSupabaseConfigured() && (
+                  <button
+                    onClick={handleLogout}
+                    className="block w-full text-center py-3 px-4 border border-danger-200 rounded-md shadow-sm text-sm font-medium text-danger-600 bg-danger-50 hover:bg-danger-100"
+                  >
+                    Keluar (Logout)
+                  </button>
+                )}
               </div>
             </div>
           </div>

@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { useAppContext } from '../context/AppContext';
 import { documentList } from '../data/documentList';
 import { DocumentItem } from '../components/documents/DocumentItem';
@@ -8,6 +8,9 @@ import { Info } from 'lucide-react';
 export function Dokumen() {
   const { state, dispatch } = useAppContext();
   const { dokumen } = state;
+  const total = documentList.length;
+  const completed = documentList.filter(doc => dokumen[doc.id]).length;
+  const percentage = Math.round((completed / total) * 100);
 
   const handleToggle = (id) => {
     dispatch({ 

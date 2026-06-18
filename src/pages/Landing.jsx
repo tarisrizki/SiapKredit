@@ -47,7 +47,7 @@ export function Landing() {
           </motion.h1>
           
           <motion.p variants={itemVariants} className="mt-4 max-w-2xl text-lg md:text-xl text-muted-foreground mx-auto mb-10">
-            SiapKredit membantu UMKM mencatat transaksi semudah chatting, dan menghitung kesiapan Anda untuk mendapat Kredit Usaha Rakyat (KUR).
+            SiapKredit membantu UMKM mencatat transaksi semudah mengetik kalkulator, dan menghitung kesiapan Anda untuk mendapat Kredit Usaha Rakyat (KUR).
           </motion.p>
           
           <motion.div variants={itemVariants} className="flex justify-center gap-4">
@@ -72,8 +72,8 @@ export function Landing() {
               <div className="mx-auto w-16 h-16 bg-blue-100 flex items-center justify-center rounded-2xl mb-6 group-hover:scale-110 group-hover:-translate-y-2 transition-transform duration-300">
                 <MessageSquare size={32} className="text-blue-600" />
               </div>
-              <h3 className="text-xl font-bold text-foreground mb-3">Input Semudah Chatting</h3>
-              <p className="text-muted-foreground">Catat "Jual 5 porsi soto @15rb" dan sistem kami akan merapikannya otomatis menjadi laporan.</p>
+              <h3 className="text-xl font-bold text-foreground mb-3">Input Semudah Kalkulator</h3>
+              <p className="text-muted-foreground">Cukup ketik nominal uang di layar seperti menggunakan kalkulator, dan laporan Anda akan otomatis tersusun.</p>
             </div>
             
             <div className="text-center group">
